@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบตรวจสอบผลการสัมภาษณ์</title>
+<style>
+  :root{
+    --navy: #10243e;
+    --navy-2: #16345a;
+    --gold: #b98a2f;
+    --gold-light: #e8c98a;
+    --paper: #f6f3ec;
+    --ink: #1c1c1c;
+    --green: #1e6b3e;
+    --green-bg: #e7f4ec;
+    --red: #a3242c;
+    --red-bg: #fbeaea;
+    --line: #d9d2c2;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Sarabun','Noto Sans Thai',sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  header{
+    width:100%;
+    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-2) 100%);
+    color:#fff;
+    padding:36px 20px 44px;
+    text-align:center;
+    position:relative;
+  }
+  header::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:-1px;
+    height:6px;
+    background: repeating-linear-gradient(135deg, var(--gold) 0 12px, var(--gold-light) 12px 24px);
+  }
+  .eyebrow{
+    letter-spacing:3px;
+    font-size:12px;
+    color: var(--gold-light);
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  h1{
+    margin:0;
+    font-size: clamp(22px, 4vw, 30px);
+    font-weight:700;
+    line-height:1.4;
+  }
+  .sub{
+    margin-top:8px;
+    font-size:14px;
+    color:#cfd8e3;
+  }
+
+  main{
+    width:100%;
+    max-width:520px;
+    padding:32px 20px 60px;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .card{
+    width:100%;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:28px 24px;
+    box-shadow: 0 2px 10px rgba(16,36,62,0.06);
+    margin-top:-30px;
+    position:relative;
+  }
+
+  label{
+    display:block;
+    font-size:14px;
+    font-weight:700;
+    margin-bottom:8px;
+    color: var(--navy);
+  }
+
+  .input-row{
+    display:flex;
+    gap:10px;
+  }
+
+  input[type="text"]{
+    flex:1;
+    font-family:inherit;
+    font-size:16px;
+    padding:12px 14px;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    outline:none;
+    transition: border-color .15s;
+    letter-spacing:1px;
+  }
+  input[type="text"]:focus{
+    border-color: var(--navy);
+  }
+
+  button.check-btn{
+    font-family:inherit;
+    font-size:15px;
+    font-weight:700;
+    background: var(--navy);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    padding:0 22px;
+    cursor:pointer;
+    transition: background .15s;
+  }
+  button.check-btn:hover{ background: var(--navy-2); }
+  button.check-btn:focus-visible{ outline:3px solid var(--gold); outline-offset:2px; }
+
+  .hint{
+    margin-top:8px;
+    font-size:12.5px;
+    color:#777;
+  }
+
+  .result{
+    margin-top:22px;
+    border-radius:10px;
+    padding:22px 20px;
+    text-align:center;
+    display:none;
+    animation: fadeIn .25s ease;
+  }
+  @keyframes fadeIn{
+    from{opacity:0; transform:translateY(4px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .result.show{ display:block; }
+
+  .result.pass{ background: var(--green-bg); border:1.5px solid var(--green); }
+  .result.fail{ background: var(--red-bg); border:1.5px solid var(--red); }
+  .result.notfound{ background:#f2f2f2; border:1.5px solid #999; }
+
+  .result .status-icon{
+    font-size:36px;
+    line-height:1;
+    margin-bottom:10px;
+  }
+  .result.pass .status-icon{ color: var(--green); }
+  .result.fail .status-icon{ color: var(--red); }
+  .result.notfound .status-icon{ color:#777; }
+
+  .result .status-text{
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:4px;
+  }
+  .result.pass .status-text{ color: var(--green); }
+  .result.fail .status-text{ color: var(--red); }
+  .result.notfound .status-text{ color:#555; }
+
+  .result .name-line{
+    font-size:14px;
+    color:#555;
+    margin-bottom:14px;
+  }
+
+  .confirm-btn{
+    display:inline-block;
+    margin-top:6px;
+    font-family:inherit;
+    font-size:15px;
+    font-weight:700;
+    background: var(--green);
+    color:#fff;
+    text-decoration:none;
+    padding:12px 26px;
+    border-radius:8px;
+    transition: background .15s;
+  }
+  .confirm-btn:hover{ background:#155631; }
+
+  footer{
+    font-size:12px;
+    color:#999;
+    padding:20px;
+    text-align:center;
+  }
+
+  .sample-note{
+    margin-top:26px;
+    font-size:12px;
+    color:#8a8370;
+    background:#fbf9f3;
+    border:1px dashed var(--line);
+    border-radius:8px;
+    padding:12px 14px;
+    width:100%;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">ประกาศผลการคัดเลือก</div>
+  <h1>ระบบตรวจสอบผลการสัมภาษณ์</h1>
+  <div class="sub">กรอกรหัสประจำตัวนิสิตเพื่อตรวจสอบผล</div>
+</header>
+
+<main>
+  <div class="card">
+    <label for="idInput">รหัสประจำตัวนิสิต</label>
+    <div class="input-row">
+      <input type="text" id="idInput" placeholder="เช่น 67010510068" autocomplete="off" inputmode="text">
+      <button class="check-btn" onclick="checkResult()">ตรวจสอบ</button>
+    </div>
+    <div class="hint">กด Enter หรือปุ่ม "ตรวจสอบ" เพื่อดูผล</div>
+
+    <div class="result" id="resultBox">
+      <div class="status-icon" id="statusIcon"></div>
+      <div class="status-text" id="statusText"></div>
+      <div class="name-line" id="nameLine"></div>
+      <a href="#" target="_blank" class="confirm-btn" id="confirmBtn" style="display:none;">ยืนยันสิทธิ์</a>
+    </div>
+  </div>
+
+  <div class="sample-note">
+    ⚠️ ตัวอย่างข้อมูลสำหรับทดสอบ: รหัส <b>1001</b>, <b>1002</b> = ผ่านการคัดเลือก · รหัส <b>1003</b> = ไม่ผ่าน<br>
+    แก้ไขรายชื่อจริงและลิงก์ Google Form ได้ในโค้ด (ดูคอมเมนต์ท้ายไฟล์)
+  </div>
+</main>
+
+<footer>© ระบบตรวจสอบผลการสัมภาษณ์</footer>
+
+<script>
+  // ================================================================
+  // แก้ไขข้อมูลผู้เข้าสอบตรงนี้ (id = รหัสประจำตัว, name = ชื่อ (ไม่บังคับ), passed = true/false)
+  // ================================================================
+  const candidates = [
+    { id: "67010511068", name: "นายสมชาย ใจดี", passed: true },
+    { id: "67010511001", name: "นางสาวสมหญิง รักเรียน", passed: false },
+    { id: "1003", name: "นายสมศักดิ์ ตั้งใจ", passed: false },
+	{ id: "1004", name: "นายสมศักดิ์ ตั้งใจ", passed: false },
+	{ id: "1005", name: "นายสมศักดิ์ ตั้งใจ", passed: false },
+	
+  ];
+
+  // ================================================================
+  // แก้ไขลิงก์ Google Form สำหรับยืนยันสิทธิ์ตรงนี้
+  // ================================================================
+  const GOOGLE_FORM_URL = "https://forms.google.com/your-form-link-here";
+
+  const idInput = document.getElementById('idInput');
+  const resultBox = document.getElementById('resultBox');
+  const statusIcon = document.getElementById('statusIcon');
+  const statusText = document.getElementById('statusText');
+  const nameLine = document.getElementById('nameLine');
+  const confirmBtn = document.getElementById('confirmBtn');
+
+  function checkResult(){
+    const val = idInput.value.trim();
+    resultBox.className = 'result';
+    confirmBtn.style.display = 'none';
+    nameLine.textContent = '';
+
+    if(!val){
+      statusIcon.textContent = '⚠';
+      statusText.textContent = 'กรุณากรอกรหัสประจำตัวนิสิต';
+      resultBox.classList.add('notfound','show');
+      return;
+    }
+
+    const found = candidates.find(c => c.id === val);
+
+    if(!found){
+      statusIcon.textContent = '?';
+      statusText.textContent = 'ไม่พบรหัสประจำตัวนี้ในระบบ';
+      resultBox.classList.add('notfound','show');
+      return;
+    }
+
+    if(found.passed){
+      statusIcon.textContent = '✓';
+      statusText.textContent = 'ผ่านการคัดเลือก';
+      nameLine.textContent = found.name || '';
+      resultBox.classList.add('pass','show');
+      confirmBtn.href = GOOGLE_FORM_URL;
+      confirmBtn.style.display = 'inline-block';
+    } else {
+      statusIcon.textContent = '✕';
+      statusText.textContent = 'ไม่ผ่านการคัดเลือก';
+      nameLine.textContent = found.name || '';
+      resultBox.classList.add('fail','show');
+    }
+  }
+
+  idInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter') checkResult();
+  });
+</script>
+
+</body>
+</html>
