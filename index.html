@@ -169,7 +169,7 @@
   .result.show{ display:block; }
 
   .result.pass{ background: var(--green-bg); border:1.5px solid var(--green); }
-  .result.fail{ background: var(--red-bg); border:1.5px solid var(--red); }
+  .result.fail{ background:#fbf5e6; border:1.5px solid var(--gold); }
   .result.notfound{ background:#f2f2f2; border:1.5px solid #999; }
 
   .result .status-icon{
@@ -178,7 +178,7 @@
     margin-bottom:10px;
   }
   .result.pass .status-icon{ color: var(--green); }
-  .result.fail .status-icon{ color: var(--red); }
+  .result.fail .status-icon{ color: var(--gold); }
   .result.notfound .status-icon{ color:#777; }
 
   .result .status-text{
@@ -187,9 +187,27 @@
     margin-bottom:4px;
   }
   .result.pass .status-text{ color: var(--green); }
-  .result.fail .status-text{ color: var(--red); }
+  .result.fail .status-text{ color: var(--navy); }
   .result.notfound .status-text{ color:#555; }
 
+  .result .soft-note{
+    font-size:14px;
+    line-height:1.7;
+    color:#4a4a4a;
+    margin-top:4px;
+  }
+  .result .role-line{
+    display:table;
+    margin-left:auto;
+    margin-right:auto;
+    font-size:14px;
+    font-weight:700;
+    color: var(--navy);
+    background: var(--gold-light);
+    border-radius:20px;
+    padding:4px 14px;
+    margin-bottom:14px;
+  }
   .result .name-line{
     font-size:14px;
     color:#555;
@@ -197,8 +215,8 @@
   }
 
   .confirm-btn{
-    display:inline-block;
-    margin-top:6px;
+    display:table;
+    margin:6px auto 0;
     font-family:inherit;
     font-size:15px;
     font-weight:700;
@@ -253,7 +271,9 @@
     <div class="result" id="resultBox">
       <div class="status-icon" id="statusIcon"></div>
       <div class="status-text" id="statusText"></div>
-      <div class="name-line" id="nameLine"></div>
+      <div class="name-line" id="nameLine" style="margin-bottom:8px"></div>
+      <div class="soft-note" id="softNote" style="display:none"></div>
+      <div class="role-line" id="roleLine" style="display:none"></div>
       <a href="#" target="_blank" class="confirm-btn" id="confirmBtn" style="display:none;">ยืนยันสิทธิ์</a>
     </div>
   </div>
@@ -267,31 +287,31 @@
 
 <script>
   // ================================================================
-  // แก้ไขข้อมูลผู้เข้าสอบตรงนี้ (id = รหัสประจำตัว, name = ชื่อ (ไม่บังคับ), passed = true/false)
+  // แก้ไขข้อมูลผู้เข้าสอบตรงนี้ (id = รหัสประจำตัว, name = ชื่อ (ไม่บังคับ), role = ตำแหน่ง (ไม่บังคับ), passed = true/false)
   // ================================================================
   const candidates = [
 	{ id: "7777", name: "admin", passed: false },
-	{ id: "68010515003", name: "นางสาวจิตรกัญญา ชัยหานิตย์", passed: true },
-	{ id: "67010511018", name: "นางสาวจิรวรรณ พรหมพิทักษ์", passed: true },
-	{ id: "66010212808", name: "นายธีรภัทร์ ถาบัณฑิต", passed: true },
+	{ id: "68010515003", name: "นางสาวจิตรกัญญา ชัยหานิตย์", role: "พี่สี/นันทนาการ", passed: true },
+	{ id: "67010511018", name: "นางสาวจิรวรรณ พรหมพิทักษ์", role: "พี่สี/นันทนาการ", passed: true },
+	{ id: "66010212808", name: "นายธีรภัทร์ ถาบัณฑิต", role: "พี่ฐาน/กิจกรรม", passed: true },
 	{ id: "68010516042", name: "นางสาวเขมจิรา สุภาพรรณ", passed: false },
-	{ id: "68010516022", name: "นางสาวภัทราพร จุมพลน้อย", passed: true },
-	{ id: "68010511066", name: "นางสาวสุชานันท์ วิชามุข", passed: true },
-	{ id: "68010511017", name: "นางสาวกฤษณา ไชยคุณ", passed: true },
+	{ id: "68010516022", name: "นางสาวภัทราพร จุมพลน้อย", role: "พี่ฐาน/กิจกรรม", passed: true },
+	{ id: "68010511066", name: "นางสาวสุชานันท์ วิชามุข", role: "พี่ฐาน/กิจกรรม", passed: true },
+	{ id: "68010511017", name: "นางสาวกฤษณา ไชยคุณ", role: "พี่สี/นันทนาการ", passed: true },
 	{ id: "69010511046", name: "นายนภดล เนาว์วงษ์", passed: false },
 	{ id: "69010511053", name: "นายปวริศ บงบุตร", passed: false },
-	{ id: "69010517039", name: "นางสาวอัญชิสา บุญสร้อย", passed: false },
-	{ id: "69010515015", name: "นางสาวมนฑิตา ประวะเสนัง", passed: true },
+	{ id: "69010517039", name: "นางสาวอัญชิสา บุญสร้อย", role: "พี่สี/นันทนาการ", passed: true },
+	{ id: "69010515015", name: "นางสาวมนฑิตา ประวะเสนัง", role: "พี่ฐาน/กิจกรรม", passed: true },
 	{ id: "68010511034", name: "นางสาวทักษอร อินาลา", passed: false },
-	{ id: "69010517032", name: "นางสาววริศรา อุดหนุน", passed: false },
-	{ id: "68010511026", name: "นางสาวฉัตรรพี วรรณพราหมณ์", passed: true },
-	{ id: "67010511086", name: "นางสาวพิมพ์วรี หรีกประโคน", passed: true },
-	{ id: "67010511092", name: "นางสาวลัคณา เฉลยกุล", passed: true },
-	{ id: "67010213051", name: "นางสาวกนกวรรณ สีหาคำ", passed: true },
-	{ id: "67010511030", name: "นางสาวทิตยาภรณ์ วงศ์ประสาร", passed: true },
-	{ id: "69010515009", name: "นางสาวนริศรา ชมพูศรี", passed: true },
-	{ id: "67010511023", name: "นายณัชพัฒน์ เลิศอภินัย", passed: true },
-	{ id: "68010511016", name: "นายกรกฤต พุฒลา", passed: true },
+	{ id: "69010517032", name: "นางสาววริศรา อุดหนุน", role: "พี่สี/นันทนาการ", passed: true },
+	{ id: "68010511026", name: "นางสาวฉัตรรพี วรรณพราหมณ์", role: "พี่สี/นันทนาการ", passed: true },
+	{ id: "67010511086", name: "นางสาวพิมพ์วรี หรีกประโคน", role: "พี่สี/นันทนาการ", passed: true },
+	{ id: "67010511092", name: "นางสาวลัคณา เฉลยกุล", role: "พี่ฐาน/กิจกรรม", passed: true },
+	{ id: "67010213051", name: "นางสาวกนกวรรณ สีหาคำ", role: "พี่ฐาน/กิจกรรม", passed: true },
+	{ id: "67010511030", name: "นางสาวทิตยาภรณ์ วงศ์ประสาร", role: "พี่ฐาน/กิจกรรม", passed: true },
+	{ id: "69010515009", name: "นางสาวนริศรา ชมพูศรี", role: "พี่สี/นันทนาการ", passed: true },
+	{ id: "67010511023", name: "นายณัชพัฒน์ เลิศอภินัย", role: "สื่อโสต", passed: true },
+	{ id: "68010511016", name: "นายกรกฤต พุฒลา", role: "สื่อโสต", passed: true },
   ];
 
   // ================================================================
@@ -304,6 +324,8 @@
   const statusIcon = document.getElementById('statusIcon');
   const statusText = document.getElementById('statusText');
   const nameLine = document.getElementById('nameLine');
+  const roleLine = document.getElementById('roleLine');
+  const softNote = document.getElementById('softNote');
   const confirmBtn = document.getElementById('confirmBtn');
 
   function checkResult(){
@@ -311,6 +333,10 @@
     resultBox.className = 'result';
     confirmBtn.style.display = 'none';
     nameLine.textContent = '';
+    roleLine.style.display = 'none';
+    roleLine.textContent = '';
+    softNote.style.display = 'none';
+    softNote.textContent = '';
 
     if(!val){
       statusIcon.textContent = '⚠';
@@ -332,13 +358,19 @@
       statusIcon.textContent = '✓';
       statusText.textContent = 'ผ่านการคัดเลือก';
       nameLine.textContent = found.name || '';
+      if(found.role){
+        roleLine.textContent = 'ตำแหน่ง: ' + found.role;
+        roleLine.style.display = 'table';
+      }
       resultBox.classList.add('pass','show');
       confirmBtn.href = GOOGLE_FORM_URL;
-      confirmBtn.style.display = 'inline-block';
+      confirmBtn.style.display = 'table';
     } else {
-      statusIcon.textContent = '✕';
-      statusText.textContent = 'ไม่ผ่านการคัดเลือก';
+      statusIcon.textContent = '✿';
+      statusText.textContent = 'ไม่ได้รับการคัดเลือก';
       nameLine.textContent = found.name || '';
+      softNote.textContent = 'ขอขอบคุณสำหรับความตั้งใจและความสนใจในการสมัครและสัมภาษณ์ครั้งนี้ ชมรมของเราประทับใจในความตั้งใจของคุณมาก ยินดีต้อนรับคุณเสมอและหวังว่าจะได้มีโอกาสมาร่วมงานกันในกิจกรรมครั้งหน้า';
+      softNote.style.display = 'block';
       resultBox.classList.add('fail','show');
     }
   }
